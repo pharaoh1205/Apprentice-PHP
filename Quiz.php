@@ -1,20 +1,36 @@
 <?php
 
+//親のクラス：すべてのアイテムの「基本形」・Original
 class item{
     public $price;
-    public $drinkname;
+    public $name;
 
-    public function __construct($drinkname){
-        $this->drinkname = $drinkname;
-
-        if($this->drinkname === "cola"){
-        $this->price = 150;
-        }
-        elseif($this->drinkname === "cider"){
-        $this->price = 100;
-        }
+    public function __construct($name, $price){
+        $this->name = $name;
+        $this->price = $price;
     }
+}
 
+//子クラスその1：普通のドリンク
+class drink extends item{
+
+}
+
+
+//子クラスその2：カップコーヒー（アイス・ホット）
+class cupcoffee extends item{
+    #[Override]
+    public function __construct($type){ // $type には 'ice' または 'hot' が入ってくる想定
+        $fullname = $type. " cup coffee"; //cupの前,半角スペースいれておく
+        $fixedprice = 100;
+
+        parent::__construct($fullname,$fixedprice);
+        //親クラスのコンストラクタである public function __construct($name, $price) に対して
+        //•	第1引数である $name の席に、自分が用意した $fullName を
+        //•	第2引数である $price の席に、自分が用意した $fixedPrice を
+        //それぞれ「引き渡して紐づけてね（代入してね）」
+
+    }
 }
 
 class VendingMachine{
@@ -38,7 +54,7 @@ class VendingMachine{
     public function pressButton($item){
         if($this->depo >= $item->price){
             $this->depo = $this->depo - $item->price;
-            return $item->drinkname; 
+            return $item->name; 
         }
         return ''; // お金が足りない場合は空文字を返す
     }
@@ -47,8 +63,8 @@ class VendingMachine{
 }
 
 
-$cider = new item("cider");
-$cola = new item("cola");
+$cider = new Drink('cider', 100);
+$cola = new Drink('cola', 150);
 
 $vendingMachine = new VendingMachine('サントリー');
 // echo $vendingMachine->pressManufacturerName();
@@ -56,7 +72,8 @@ $vendingMachine = new VendingMachine('サントリー');
 $vendingMachine->depositCoin(100);
 echo $vendingMachine->pressButton($cider);
 
-$vendingMachine->depositCoin(100);
-echo $vendingMachine->pressButton($cola);
+// サンプル呼び出しのように、'hot' や 'ice' だけを渡してインスタンスを作る
+$hotCupCoffee = new CupCoffee('hot');
+$iceCupCoffee = new CupCoffee('ice');
 
 ?>
