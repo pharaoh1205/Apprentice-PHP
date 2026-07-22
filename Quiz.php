@@ -32,6 +32,12 @@ class cupcoffee extends item{
     }
 }
 
+//子クラスその33：snack
+class snack extends item{
+    public $name = "potetoChips";
+    public $price = 150;
+}
+
 class VendingMachine{
     public $name;
     //public $money; ※自販機に投入したお金 一時的な値で自販機が記憶すべきものではないのでここには書かない
@@ -65,7 +71,7 @@ class VendingMachine{
         if($this->depo < $item->price){
             return ''; // お金が足りない場合は空文字を返す
         } 
-        // ❷ 「カップコーヒー」購入の場合
+        // ❷ 「カップコーヒー」購入の場合 ※returnされないとそのまま❸の処理に進むので購入した場合は金額も減る
         if($item instanceOf cupcoffee){//カップのストックある場合１つ使う。ない場合は購入不可
             if($this->cups > 0){
                 $this->cups -= 1;
@@ -75,7 +81,7 @@ class VendingMachine{
             }
 
         }
-        // ❸ 普通のドリンク購入の場合
+        // ❸ 価格処理
         $this->depo = $this->depo - $item->price;
         return $item->name; 
     }
@@ -103,6 +109,11 @@ $vendingMachine->addCup(1);
 
 // 再度カップコーヒーを購入（カップがあるので買える！100円消費 / 残金0円）
 echo $vendingMachine->pressButton($hotCupCoffee) . "\n"; // 出力: hot cup coffee
+
+$potetoChips = new snack("potetoChips", 150);
+$vendingMachine->depositCoin(150);
+echo $vendingMachine->pressButton($potetoChips). "\n";
+
 
 
 ?>
