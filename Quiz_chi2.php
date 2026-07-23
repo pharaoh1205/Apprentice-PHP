@@ -8,7 +8,7 @@ class Cupcoffee extends item
 {
     public function __construct($type)
     {
-    // $type には 'ice' または 'hot' が入ってくる想定
+        // $type には 'ice' または 'hot' が入ってくる想定
         $fullname = $type . " cup coffee"; //cupの前,半角スペースいれておく
         $fixedprice = 100;
 
@@ -20,14 +20,14 @@ class Cupcoffee extends item
     }
     public function canBuy($vendingMachine)
     {
-        if($vendingMachine->cups < 0){
-                return '';
-        }
+        return $vendingMachine->cups > 0;
+    
     }
+    
     #[Override]
     public function processPurchase($vendingMachine)
     {
-       return $vendingMachine->cups -=1;
+       $vendingMachine->cups -=1;//親のprocessPurchaseでreturn使ってないのでreturnつけない
         
     }
 }
