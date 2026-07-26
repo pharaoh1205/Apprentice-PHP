@@ -36,8 +36,8 @@ class Deck
         //デッキにカード格納
         foreach($suits as $suit){
             foreach($ranks as $rank => $strength){
-            $this->cards[] = new Card($suit, $rank, $strength);//なぜ $this->cards にカードを入れるのか？
-            //→「後から shuffle() や deal()（カードを配る処理）で使いたいから、消えない場所（$this->cards）にカードをしまっておく」**ため
+                $this->cards[] = new Card($suit, $rank, $strength);//なぜ $this->cards にカードを入れるのか？
+                //→後から shuffle() や deal()（カードを配る処理）で使いたいから、消えない場所（$this->cards）にカードをしまっておくため
             }
         }
 
@@ -75,7 +75,8 @@ class Player {
 
 
     //❸カードを1枚出す（drawCard）
-    public function drawCard(): ?Card {
+    public function drawCard(): ?Card {//カード（Card クラスのデータ）を1枚返すよ！
+     //カードを返せるかもしれないし、手ぶら（null）で帰ってくるかもしれない」という不確定な状態だから?(クエスチョン)
         return array_shift($this->hand);
     }
 
