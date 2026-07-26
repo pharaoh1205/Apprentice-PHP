@@ -41,61 +41,62 @@ echo "戦争を始めます" . PHP_EOL;
 echo "カードが配られました" . PHP_EOL;
 
 
-function playTurn(&$p1Hand, &$p2Hand, &$tableCards =[]){ //&つけるのはここだけでOK
-    echo "戦争！" . PHP_EOL;
+function playGame(&$p1Hand, &$p2Hand) {
+    $tableCards = []; // 場札の箱 / $tableCards = []; という場札リセットあるので参照渡し不要
 
-    while($p1Hand > 0 || $p2Hand > 0) {
-        //山札から手札を一枚引く
+    // 【1】どちらかの手札がなくなるまで、ずーっと勝負を繰り返す（whileループ）
+    while (count($p1Hand) > 0 && count($p2Hand) > 0) {
+        echo "戦争！" . PHP_EOL;
+
+        //手札からカードを１枚引く
         $p1Card = array_shift($p1Hand);
         $p2Card = array_shift($p2Hand);
 
-        // 場にカードを置く
-        $tableCard[] = $p1Card;
-        $tableCard[] = $p2Card;
+		//引いたカードを場に出す
+        $tableCards[] = $p1Card;
+        $tableCards[] = $p2Card;
 
         echo "プレイヤー1のカードは{$p1Card->suit}の{$p1Card->rank}です。" . PHP_EOL;
         echo "プレイヤー2のカードは{$p2Card->suit}の{$p2Card->rank}です。" . PHP_EOL;
 
-
-        //勝負
-        if($p1Card->strength > $p2Card->strength){
-            echo "プレイヤー1の勝利ですプレイヤー1はカードを2枚もらいました。" . PHP_EOL;
-
-            // 1. 場札をプレイヤー1の手札（末尾）に追加する
+        // 勝敗判定
+        if ($p1Card->strength > $p2Card->strength) {
+            $count = count($tableCards);
+            echo "プレイヤー1が勝ちました。プレイヤー1はカードを{$count}枚もらいました。" . PHP_EOL;
             $p1Hand = array_merge($p1Hand, $tableCards);
-            // 2. 場札を空にする
-            $tableCards = [];
-        }
-        elseif($p2Card->strength > $p1Card->strength){
-            echo "プレイヤー2の勝利ですプレイヤー2はカードを2枚もらいました。" . PHP_EOL;
+            $tableCards = []; // 場札リセット
 
-            // 1. 場札をプレイヤー2の手札（末尾）に追加する
+        } elseif ($p2Card->strength > $p1Card->strength) {
+            $count = count($tableCards);
+            echo "プレイヤー2が勝ちました。プレイヤー2はカードを{$count}枚もらいました。" . PHP_EOL;
             $p2Hand = array_merge($p2Hand, $tableCards);
-            // 2. 場札を空にする
-            $tableCards = [];
-        }
-        else{
-            echo "引き分けです" . PHP_EOL;
-            playTurn($p1Hand, $p2Hand, $tableCard);
+            $tableCards = []; // 場札リセット
+
+        } else {
+            echo "引き分けです。" . PHP_EOL;
+            // ★ここポイント！再帰呼び出しはしない！
+            // 何もせずそのまま次のループに行けば、場札（$tableCards）が残ったまま次の勝負ができる！
         }
     }
 
-    
-    if(count($p2Hand) === 0){
-        echo "プレイヤー2の手札がなくなりました。 . PHP_EOL";
-        echo "プレイヤー1の手札の枚数は52枚です。プレイヤー2の手札の枚数は0枚です。。" . PHP_EOL;
-        echo "プレイヤー1が1位、プレイヤー2が2位です。 . PHP_EOL";
+    // 【2】どちらかの手札が0枚になったら、whileを抜けて結果表示へ
+    $p1Count = count($p1Hand);
+    $p2Count = count($p2Hand);
+
+    if ($p2Count === 0) {
+        echo "プレイヤー2の手札がなくなりました。" . PHP_EOL;
+    } else {
+        echo "プレイヤー1の手札がなくなりました。" . PHP_EOL;
     }
-    else{
-        echo "プレイヤー1の手札がなくなりました。 . PHP_EOL";
-        echo "プレイヤー2の手札の枚数は52枚です。プレイヤー1の手札の枚数は0枚です。。" . PHP_EOL;
+
+    echo "プレイヤー1の手札の枚数は{$p1Count}枚です。プレイヤー2の手札の枚数は{$p2Count}枚です。" . PHP_EOL;
+
+    if ($p1Count > $p2Count) {
+        echo "プレイヤー1が1位、プレイヤー2が2位です。" . PHP_EOL;
+    } else {
         echo "プレイヤー2が1位、プレイヤー1が2位です。" . PHP_EOL;
     }
-    
-    
-
 }
 
-playTurn($p1Hand, $p2Hand, $tableCards);
-
-echo "戦争を終了します。" . PHP_EOL;
+// 呼び出しはこれ1行だけ！
+playGame($player1Hand, $player2Hand);
