@@ -10,9 +10,9 @@ class Card{
     //３つのステータスをデフォで持てるようにする
     public function __construct($suit, $rank, $strength)//変数名だけでなく、string(型) $suit(変数名)で書く
     {
-        $This->suit = $suit; 
-        $This->rank = $rank; 
-        $This->strength = $strength; 
+        $this->suit = $suit; 
+        $this->rank = $rank; 
+        $this->strength = $strength; 
     }
 }
 
@@ -25,7 +25,7 @@ $ranks = ["2" => 2, "3" => 3, "4" => 4, "5" => 5, "6" => 6, "7" => 7, "8" => 8, 
 $deck = [];
 foreach($suits as $suit){
     foreach($ranks as $rank => $strength){
-        $card = new Card($suit, $rank, $strength);
+        $deck[] = new Card($suit, $rank, $strength);
     }
 }
 //カードシャッフル
@@ -50,8 +50,8 @@ function playTurn(&$p1Hand, &$p2Hand, &$tableCards =[]){ //&つけるのはこ�
         $p2Card = array_shift($p2Hand);
 
         // 場にカードを置く
-        $tablecard[] = $p1Card;
-        $tablecard[] = $p2Card;
+        $tableCard[] = $p1Card;
+        $tableCard[] = $p2Card;
 
         echo "プレイヤー1のカードは{$p1Card->suit}の{$p1Card->rank}です。" . PHP_EOL;
         echo "プレイヤー2のカードは{$p2Card->suit}の{$p2Card->rank}です。" . PHP_EOL;
@@ -75,21 +75,21 @@ function playTurn(&$p1Hand, &$p2Hand, &$tableCards =[]){ //&つけるのはこ�
             $tableCards = [];
         }
         else{
-            echo "引き分けです . PHP_EOL";
+            echo "引き分けです" . PHP_EOL;
             playTurn($p1Hand, $p2Hand, $tableCard);
         }
     }
 
     
-    if($p1Hand > 0){
+    if(count($p2Hand) === 0){
         echo "プレイヤー2の手札がなくなりました。 . PHP_EOL";
-        echo "プレイヤー1の手札の枚数は52枚です。プレイヤー2の手札の枚数は0枚です。。 . PHP_EOL";
+        echo "プレイヤー1の手札の枚数は52枚です。プレイヤー2の手札の枚数は0枚です。。" . PHP_EOL;
         echo "プレイヤー1が1位、プレイヤー2が2位です。 . PHP_EOL";
     }
     else{
         echo "プレイヤー1の手札がなくなりました。 . PHP_EOL";
-        echo "プレイヤー2の手札の枚数は52枚です。プレイヤー1の手札の枚数は0枚です。。 . PHP_EOL";
-        echo "プレイヤー2が1位、プレイヤー1が2位です。 . PHP_EOL";
+        echo "プレイヤー2の手札の枚数は52枚です。プレイヤー1の手札の枚数は0枚です。。" . PHP_EOL;
+        echo "プレイヤー2が1位、プレイヤー1が2位です。" . PHP_EOL;
     }
     
     
