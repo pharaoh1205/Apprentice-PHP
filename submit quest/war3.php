@@ -97,45 +97,90 @@ class Player {
     }
 }
 
+// 4. ゲームの進行・審判クラス
+class WarGame {
+    private Player $player1; //Playerは型指定（PlayerクラスのインスタンスのみOK）プレイヤー1用スロット
+    private Player $player2; //プレイヤー2用スロット
 
-
-
-//進行処理
-echo "戦争を始めます" . PHP_EOL;
-echo "カードが配られました" . PHP_EOL;
-
-
-function playTurn(&$p1Hand, &$p2Hand, &$tablecard =[]){ //&つけるのはここだけでOK
-    echo "戦争！" . PHP_EOL;
-
-    //山札から手札を一枚引く
-    $p1Card = array_shift($p1Hand);
-    $p2Card = array_shift($p2Hand);
-
-    // 場にカードを置く
-    $tablecard[] = p1Card;
-    $tablecard[] = p2Card;
-
-    echo "プレイヤー1のカードは{$p1Card->suit}の{$p1Card->rank}です。" . PHP_EOL;
-    echo "プレイヤー2のカードは{$p2Card->suit}の{$p2Card->rank}です。" . PHP_EOL;
-
-
-    //勝負
-    if($p1Card->strength > $p2Card->strength){
-        echo "プレイヤー1の勝利です" . PHP_EOL;
-
-        
-    }
-    elseif($p2Card->strength > $p1Card->strength){
-        echo "プレイヤー2の勝利です" . PHP_EOL;
-    }
-    else{
-        echo "引き分けです . PHP_EOL";
-        playTurn($p1Hand, $p2Hand, $tablecard);
+    public function __construct(Player $p1, Player $p2) {
+        $this->player1 = $p1;  //$this->player1 はさっき上で作成したゲーム機の中の「プレイヤー1用スロット」$p1 ➔ 外から運ばれてきたプレイヤー1
+        $this->player2 = $p2;  //外から受け取った $p2 をゲーム機の中のポケット（$this->player2）にガッチャンコと差し込んで保存
     }
 
+    public function start(): void {
+        // ❶山札を作って配る
+        $deck = new Deck(); //Deckクラスのインスタンス化
+        $deck->shuffle();   //シャッフル
+        $this->player1->setHand($deck->deal(26));
+        $this->player2->setHand($deck->deal(26));
+
+        echo "戦争を始めます" . PHP_EOL;
+        echo "カードが配られました" . PHP_EOL;
+
+        $tableCards = [];
+
+        // ❷両者手札がある間ループ
+        while ($this->player1->hasHand() && $this->player2->hasHand()) {
+            echo "戦争！" . PHP_EOL;
+
+            $card1 = $this->player1->drawCard();
+            $card2 = $this->player2->drawCard();
+
+            $tableCards[] = $card1;
+            $tableCards[] = $card2;
+
+            echo "{$this->player1->name}のカードは{$card1->suit}の{$card1->rank}です。" . PHP_EOL;
+            echo "{$this->player2->name}のカードは{$card2->suit}の{$card2->rank}です。" . PHP_EOL;
+
+            if ($card1->strength > $card2->strength) {
+                $count = count($tableCards);
+                echo "{$this->player1->name}が勝ちました。{$this->player1->name}はカードを{$count}枚もらいました。" . PHP_EOL;
+                $this->player1->addCards($tableCards);
+                $tableCards = [];
+            } elseif ($card2->strength > $card1->strength) {
+                $count = count($tableCards);
+                echo "{$this->player2->name}が勝ちました。{$this->player2->name}はカードを{$count}枚もらいました。" . PHP_EOL;
+                $this->player2->addCards($tableCards);
+                $tableCards = [];
+            } else {
+                echo "引き分けです。" . PHP_EOL;
+            }
+        }
+
+        // 決着処理
+        $this->showResult();
+    }
+
+    // ❸ 結果表示（showResult）
+    private function showResult(): void {
+        $p1Count = $this->player1->getHandCount();
+        $p2Count = $this->player2->getHandCount();
+
+        // どっちの手札がなくなったかを判定
+        if ($p1Count === 0) {
+            echo "{$this->player1->name}の手札がなくなりました。" . PHP_EOL;
+        } else {
+            echo "{$this->player2->name}の手札がなくなりました。" . PHP_EOL;
+        }
+
+        // 最終的な枚数を表示
+        echo "{$this->player1->name}の手札の枚数は{$p1Count}枚です。{$this->player2->name}の手札の枚数は{$p2Count}枚です。" . PHP_EOL;
+
+        // 順位を発表
+        if ($p1Count > $p2Count) {
+            echo "{$this->player1->name}が1位、{$this->player2->name}が2位です。" . PHP_EOL;
+        } else {
+            echo "{$this->player2->name}が1位、{$this->player1->name}が2位です。" . PHP_EOL;
+        }
+        echo "戦争を終了します。" . PHP_EOL;
+    }
 }
 
-playTurn($p1Hand, $p2Hand, $tablecard);
+// 実行（呼び出し側はこれだけ！）
+$game = new WarGame(
+    new Player("プレイヤー1"),
+    new Player("プレイヤー2")
+);
+$game->start();
 
-echo "戦争を終了します。" . PHP_EOL;
+
